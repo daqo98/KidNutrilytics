@@ -15,4 +15,11 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
         docker build . -t kidnutrilytics.azurecr.io/myapp:${{ github.sha }}
-        docker push kidnutrilytics.azurecr.io/myapp:${{ github.sha }}  
+        docker push kidnutrilytics.azurecr.io/myapp:${{ github.sha }}
+
+
+    - uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'myapp'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        images: 'kidnutrilytics.azurecr.io/myapp:${{ github.sha }}'
