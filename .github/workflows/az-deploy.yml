@@ -14,5 +14,5 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker build . -t kidnutrilytics.azurecr.io/KidNutrilytics:${{ github.sha }}
-        docker push kidnutrilytics.azurecr.io/KidNutrilytics:${{ github.sha }}  
+        docker build . -t kidnutrilytics.azurecr.io/myapp:${{ github.sha }}
+        docker push kidnutrilytics.azurecr.io/myapp:${{ github.sha }}  
