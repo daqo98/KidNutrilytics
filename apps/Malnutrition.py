@@ -58,10 +58,10 @@ plot_table_m = df_show_m[['Child ID', 'ind_estudia', 'ingresos_promp_imp', 'uni_
 dist_plot_m = zscore_plot.zscore_distplot(show_table_m)
 """
 #-----------------------------------------*Malnutrition*------------------------------
-with urlopen('https://kidnutrilytics.blob.core.windows.net/blob1/Modelo_malnutrition.sav?sp=r&st=2021-11-21T17:20:08Z&se=2022-06-01T01:20:08Z&spr=https&sv=2020-08-04&sr=b&sig=o0PXQlRosNzjG8dn21NbFo3bIHLBoaGMTnwpQreXOsA%3D') as response:
+with urlopen('https://kidnutrilytics1.blob.core.windows.net/blob1/Modelo_malnutrition.sav?sp=r&st=2021-12-21T02:48:43Z&se=2022-05-31T10:48:43Z&spr=https&sv=2020-08-04&sr=b&sig=%2FPZITTz6Y%2FMQuT0Hn2LcipJeuynr3MUzlc%2B%2FkTOXock%3D') as response:
     modelo_malnutrition = joblib.load(response)
 
-base_malnutrition = pd.read_csv('https://kidnutrilytics.blob.core.windows.net/blob1/base_malnutrition.csv?sp=r&st=2021-11-21T17:17:03Z&se=2022-06-01T01:17:03Z&spr=https&sv=2020-08-04&sr=b&sig=%2BFhP6%2FQT4PWF6sr1J8Wq22o7I5m%2BFZRv72BRsmCMwu8%3D').drop(["IdBeneficiario","Unnamed: 0","Unnamed: 0.1"],axis=1)
+base_malnutrition = pd.read_csv('https://kidnutrilytics1.blob.core.windows.net/blob1/base_malnutrition.csv?sp=r&st=2021-12-21T02:51:21Z&se=2022-05-31T10:51:21Z&spr=https&sv=2020-08-04&sr=b&sig=9vYm1aXrtcKyjrFTBJjWGbHcmgyUSZM4rlwf8c0Rgf0%3D').drop(["IdBeneficiario","Unnamed: 0","Unnamed: 0.1"],axis=1)
 #-----------------------------------------*Malnutrition*------------------------------
 top10_df_m = top10table.createTable_top(modelo_malnutrition, base_malnutrition)
 p_range_m = str(top10_df_m["Range_probability"].iloc[0])
