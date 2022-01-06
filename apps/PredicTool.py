@@ -14,10 +14,10 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
-with urlopen('https://kidnutrilytics1.blob.core.windows.net/blob1/Modelo_relapse_subset.sav?sp=r&st=2021-12-21T02:53:05Z&se=2022-05-31T10:53:05Z&spr=https&sv=2020-08-04&sr=b&sig=QyaFwrJLxgFOpYjoHcXTNneLW3kpJnEvsXy4zhgHGH4%3D') as response:
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_relapse_subset.sav?sp=r&st=2022-01-06T22:00:18Z&se=2022-02-07T06:00:18Z&spr=https&sv=2020-08-04&sr=b&sig=lAIZJ7rVMkMcU52dkqhXCjTgqXNUO2dB%2BPeKfCXCTII%3D') as response:
     Modelo_relapse_subset = joblib.load(response)
 
-with urlopen('https://kidnutrilytics1.blob.core.windows.net/blob1/Modelo_malnutrition_subset.sav?sp=r&st=2021-12-21T02:52:20Z&se=2022-05-31T10:52:20Z&spr=https&sv=2020-08-04&sr=b&sig=gyn2Mc2G3YFGZlauuZlZ9ca1yyGM0fAzJZxOhBpS%2F1Y%3D') as response:
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_malnutrition_subset.sav?sp=r&st=2022-01-06T21:59:33Z&se=2022-02-07T05:59:33Z&spr=https&sv=2020-08-04&sr=b&sig=oz1ivzh%2FxovmoTtNR9Jf7prsoJ7qN76h3fGVDAkJBfo%3D') as response:
     Modelo_malnutrition_subset = joblib.load(response)
 
 
