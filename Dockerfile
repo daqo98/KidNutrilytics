@@ -7,6 +7,6 @@ COPY . ./
 RUN python -m pip install -r requirements.txt
 #RUN pip install -U numpy
 
-EXPOSE 8080
+EXPOSE 8080 2222
 
 CMD python main.py  
