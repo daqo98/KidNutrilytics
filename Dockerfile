@@ -10,7 +10,5 @@ RUN pip install --no-binary=shap 'shap==0.39.0' --force-reinstall
 #RUN pip install -U numpy
 
 EXPOSE 8080 2222
-# Open port 2222 for SSH access
-EXPOSE 80 2222
 
 CMD python main.py
