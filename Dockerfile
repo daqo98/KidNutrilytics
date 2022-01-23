@@ -4,6 +4,8 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
+RUN apt-get update && \
+      apt-get -y install sudo
 COPY ODBC_driver.sh .
 RUN ["chmod", "+x", "./ODBC_driver.sh"]
 RUN ./ODBC_driver.sh
