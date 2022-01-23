@@ -4,13 +4,13 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-# Add unixodbc support
-RUN apt-get update \
-        && apt-get install -y --no-install-recommends unixodbc-dev
+RUN ./ODBC_driver.sh
 RUN python -m pip install -r requirements.txt
 RUN pip install --no-binary=shap 'shap==0.39.0' --force-reinstall
 #RUN pip install -U numpy
 
 EXPOSE 8080 2222
+# Open port 2222 for SSH access
+EXPOSE 80 2222
 
 CMD python main.py
