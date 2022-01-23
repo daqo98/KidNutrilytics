@@ -6,6 +6,9 @@ COPY . ./
 
 RUN apt-get update && \
       apt-get -y install sudo
+# Add unixodbc support
+RUN apt-get update \
+      && apt-get install -y --no-install-recommends unixodbc-dev
 COPY ODBC_driver.sh .
 RUN ["chmod", "+x", "./ODBC_driver.sh"]
 RUN ./ODBC_driver.sh
