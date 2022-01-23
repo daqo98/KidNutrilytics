@@ -52,72 +52,52 @@ def pandas_df_from_azure_query(query):
     return df
 
 #Se filtran beneficiarios cuyo target de relapse para los próximos 6 meses sea 1
-df_target1_relapse = pandas_df_from_azure_query(
+df_base_target_2018 = pandas_df_from_azure_query(
 """
-SELECT *
-FROM base_target_2018
-WHERE Marca_Target_Reincidencia_F6M == 1
+SELECT IdBeneficiario, Marca_Target_Reincidencia_F6M, Marca_Target_EntroEnDesnutricion_F6M,
+cod_dpto, nom_dpto
+FROM ICBF.base_target_2018
 """
 )
 
-#Se filtran beneficiarios cuyo target de desnutrición para los próximos 6 meses sea 1
-df_target1_mal = pandas_df_from_azure_query(
+df_base_target_2019 = pandas_df_from_azure_query(
 """
-SELECT *
-FROM base_target_2018
-WHERE Marca_Target_EntroEnDesnutricion_F6M == 1
+SELECT IdBeneficiario, Marca_Target_Reincidencia_F6M, Marca_Target_EntroEnDesnutricion_F6M,
+cod_dpto, nom_dpto
+FROM ICBF.base_target_2019
 """
 )
+
+df_base_target_2018['Año'] = 2018
+df_base_target_2019['Año'] = 2019
+
+df_base_target = pd.concat(df_base_target_2018, df_base_target_2019)
+
+#Se filtran beneficiarios cuyo target de relapse para los próximos 6 meses sea 1
+df_target1_relapse = base_target[base_target['Marca_Target_Reincidencia_F6M']==1]
+#Se filtran beneficiarios cuyo target de desnutrición para los próximos 6 meses sea 1
+df_target1_mal = base_target[base_target['Marca_Target_EntroEnDesnutricion_F6M']==1]
 
 #Se agrupan los target de relapse por dpto para obtener el count
-dpts_count_target1_relapse = pandas_df_from_azure_query(
-"""
-SELECT cod_dpto, nom_dpto, COUNT(0) AS Count_Dpto_Relapse
-FROM df_target1_relapse
-GROUP BY 1,2
-ORDER BY 1,2
-"""
-)
+dpts_count_target1_relapse = df_target1_relapse.groupby(['cod_dpto', 'nom_dpto']).size().to_frame('Count_Dpto_Relapse').reset_index()
 
 #Se agrupan los target de malnutrition por dpto para obtener el count
-dpts_count_target1_mal = pandas_df_from_azure_query(
-"""
-SELECT cod_dpto, nom_dpto, COUNT(0) AS Count_Dpto_Malnutrition
-FROM df_target1_mal
-GROUP BY 1,2
-ORDER BY 1,2
-"""
-)
+dpts_count_target1_mal = df_target1_mal.groupby(['cod_dpto', 'nom_dpto']).size().to_frame('Count_Dpto_Malnutrition').reset_index()
 
 #Se agrupan el count total de registros suministrados por dpto
-dpts_count_total = pandas_df_from_azure_query(
-"""
-SELECT cod_dpto, nom_dpto, COUNT(0) AS Count_Dpto_Total
-FROM base_target_2018
-GROUP BY 1,2
-ORDER BY 1,2
-"""
-)
+dpts_count_total = base_target.groupby(['cod_dpto', 'nom_dpto']).size().to_frame('Count_Dpto_Total').reset_index()
 
 #Se unen los 3 dfs creados anteriormente
-df_complete = pandas_df_from_azure_query(
-"""
-SELECT * FROM dpts_count_target1_relapse UNION ALL
-SELECT * FROM dpts_count_target1_mal UNION ALL
-SELECT * FROM dpts_count_total
-"""
-)
+data_frames = [dpts_count_total, dpts_count_target1_mal, dpts_count_target1_relapse]
+dpts_count = reduce(lambda  left,right: pd.merge(left,right,on=["cod_dpto", "nom_dpto"]), data_frames)
 
 #Se crea una columna con el ratio entre count relapse y total por dept
-dpts_count = pandas_df_from_azure_query(
-"""
-SELECT CAST(cod_dpto AS INT), nom_dpto, Count_Dpto_Total, Count_Dpto_Malnutrition, Count_Dpto_Relapse,
-  Count_Dpto_Relapse/Count_Dpto_Total AS count_ratio_relapse,
-  Count_Dpto_Malnutrition/Count_Dpto_Total AS count_ratio_mal
-FROM df_complete
-"""
-)
-
+dpts_count["Relapse_Percentage"] = dpts_count["Count_Dpto_Relapse"]/dpts_count["Count_Dpto_Total"]*100
+#Se crea una columna con el ratio entre count malnutrition y total por dept
+dpts_count["Malnutrition_Percentage"] = dpts_count["Count_Dpto_Malnutrition"]/dpts_count["Count_Dpto_Total"]*100
+#Casting y cambios de formato
+dpts_count['cod_dpto']=pd.to_numeric(dpts_count['cod_dpto'])
+dpts_count['cod_dpto']=dpts_count['cod_dpto'].astype(int).apply(lambda x: '{0:0>2}'.format(x))
 
 #mapa = requests.get("https://mapsmicroservice-zbca65qbuq-nn.a.run.app/api/v1/maps")
 #dpts_count = pd.DataFrame.from_dict(mapa.json())
@@ -126,7 +106,7 @@ FROM df_complete
 base_pivot = pandas_df_from_azure_query(
 """
 SELECT *
-FROM tomas_pivot
+FROM ICBF.tomas_pivot
 """
 )
 

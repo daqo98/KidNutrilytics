@@ -47,10 +47,29 @@ def pandas_df_from_azure_query(query):
     return df
 
 """
--------------------------------------------Data(Microservices Requests)------------------------------------
+-------------------------------------------Data-SQL Queries------------------------------------
 """
 
 #-----------------------------------------*Relapse*-------------------------------------
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_relapse.sav') as response:
+    modelo_relapse = joblib.load(response)
+
+base_relapse = pandas_df_from_azure_query(
+"""
+SELECT *
+FROM ICBF.base_relapse
+"""
+)
+
+top10_df_r = top10table.createTable_top(modelo_relapse, base_relapse)
+p_range_r = str(top10_df_r["Range_probability"].iloc[0])
+n_children_r = top10_df_r.shape[0]
+shap_r = SHAP_Val.plotShapValuesTop(modelo_relapse, top10_df_r)
+s_table_r, plot_table_r = top10table.table_to_show(top10_df_r)
+show_table_r = s_table_r[s_table_r['AVG ZScore'] > -100].sample(1000)
+dist_plot_r = zscore_plot.zscore_distplot(show_table_r)
+
+"""
 #probability range
 p_range_r = requests.get('https://sharpmicro2-zbca65qbuq-nn.a.run.app/api/v2/rel_p').json()
 #number of children at risk
@@ -67,15 +86,16 @@ show_table_r = df_show_r[['Child ID', 'MIN ZScore', 'MAX ZScore', 'AVG ZScore', 
 plot_table_r = df_show_r[['Child ID', 'ind_estudia', 'ingresos_promp_imp', 'uni_dias_agua', 'noprivaciones',
                     'tipo_cuidado', 'cod_clase', 'sexo_persona', 'estrato']].copy()
 dist_plot_r = zscore_plot.zscore_distplot(show_table_r)
+"""
 #-----------------------------------------*Malnutrition*----------------------------------
 
-with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_malnutrition.sav?sp=r&st=2022-01-06T21:55:18Z&se=2022-02-07T05:55:18Z&spr=https&sv=2020-08-04&sr=b&sig=8PIAvESFCTT3nCXoscaZKWke34Tjv1l9%2FE5mgCM9EJI%3D') as response:
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_malnutrition.sav') as response:
     modelo_malnutrition = joblib.load(response)
 
 base_malnutrition = pandas_df_from_azure_query(
 """
 SELECT *
-FROM base_malnutrition
+FROM ICBF.base_malnutrition
 """
 )
 #-----------------------------------------*Malnutrition*------------------------------
