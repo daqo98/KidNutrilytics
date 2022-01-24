@@ -6,7 +6,7 @@ COPY . ./
 
 ARG DEBIAN_FRONTEND=noninteractive
 # Microsoft SQL Server Prerequisites
-RUN   apt-get update \
+RUN apt-get update \
   && apt-get install -y wget \
   && rm -rf /var/lib/apt/lists/*
 RUN wget http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/multiarch-support_2.27-3ubuntu1.4_amd64.deb\
