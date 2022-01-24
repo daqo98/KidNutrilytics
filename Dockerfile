@@ -4,6 +4,7 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
+ARG DEBIAN_FRONTEND=noninteractive
 # Microsoft SQL Server Prerequisites
 RUN   apt-get update \
   && apt-get install -y wget \
