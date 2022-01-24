@@ -24,7 +24,7 @@ server = 'ds4a-server2.database.windows.net'
 database = 'ds4a'
 username = 'namonroyr'
 password = 'ds4a123*'
-driver= '{ODBC Driver 17 for SQL Server}'
+driver= '/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.8.so.1.1'
 
 conn = pyodbc.connect('DRIVER='+driver+';SERVER=tcp:'+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password)
 
