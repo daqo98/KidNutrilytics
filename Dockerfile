@@ -17,9 +17,9 @@ RUN apt-get update \
     && curl https://packages.microsoft.com/config/debian/9/prod.list \
         > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
     && apt-get -y --no-install-recommends install \
-        unixodbc-dev \
-        msodbcsql17
+        unixodbc-dev
 RUN python -m pip install -r requirements.txt
 RUN pip install --no-binary=shap 'shap==0.39.0' --force-reinstall
 #RUN pip install -U numpy
