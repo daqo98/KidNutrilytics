@@ -21,6 +21,7 @@ RUN apt-get update \
     && apt-get -y --no-install-recommends install \
         unixodbc-dev
 RUN odbcinst -j
+RUN cat /etc/odbcinst.ini
 RUN python -m pip install -r requirements.txt
 RUN pip install --no-binary=shap 'shap==0.39.0' --force-reinstall
 #RUN pip install -U numpy
