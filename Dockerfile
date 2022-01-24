@@ -4,14 +4,20 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-RUN apt-get update && \
-      apt-get -y install sudo
-# Add unixodbc support
+# Microsoft SQL Server Prerequisites
 RUN apt-get update \
-      && apt-get install -y --no-install-recommends unixodbc-dev
-COPY ODBC_driver.sh .
-RUN ["chmod", "+x", "./ODBC_driver.sh"]
-RUN ./ODBC_driver.sh
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/9/prod.list \
+        > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get install -y --no-install-recommends \
+        locales \
+        apt-transport-https \
+    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen \
+    && apt-get update \
+    && apt-get -y --no-install-recommends install \
+        unixodbc-dev \
+        msodbcsql17
 RUN python -m pip install -r requirements.txt
 RUN pip install --no-binary=shap 'shap==0.39.0' --force-reinstall
 #RUN pip install -U numpy
