@@ -20,6 +20,7 @@ RUN apt-get update \
     && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
     && apt-get -y --no-install-recommends install \
         unixodbc-dev
+RUN odbcinst -j
 RUN python -m pip install -r requirements.txt
 RUN pip install --no-binary=shap 'shap==0.39.0' --force-reinstall
 #RUN pip install -U numpy
