@@ -44,8 +44,8 @@ with open(LOCALFILENAME_MALNUTRITION, "wb") as my_blob:
 #-----------------------------------------*Relapse*-------------------------------------
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_relapse.sav') as response:
     modelo_relapse = joblib.load(response)
-
-base_relapse = pd.read_csv('https://kidnutrilytics2.blob.core.windows.net/blob2/base_relapse.csv?sp=r&st=2022-01-26T00:57:43Z&se=2022-05-01T08:57:43Z&sip=186.86.32.33&spr=https&sv=2020-08-04&sr=b&sig=HFp5XmZRRxn7JFSTwpIQalhsGvVtEqu1viK2VX1zuck%3D')
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/base_relapse.csv') as response:
+    base_relapse = pd.read_csv(response)
 top10_df_r = top10table.createTable_top(modelo_relapse, base_relapse)
 p_range_r = str(top10_df_r["Range_probability"].iloc[0])
 n_children_r = top10_df_r.shape[0]
@@ -58,8 +58,8 @@ dist_plot_r = zscore_plot.zscore_distplot(show_table_r)
 
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_malnutrition.sav') as response:
     modelo_malnutrition = joblib.load(response)
-
-base_malnutrition = pd.read_csv('https://kidnutrilytics2.blob.core.windows.net/blob2/base_malnutrition.csv?sp=r&st=2022-01-26T03:02:29Z&se=2022-05-01T11:02:29Z&sip=186.86.32.33&spr=https&sv=2020-08-04&sr=b&sig=lRRXZSvl%2FZX9yMP6IxA1xW70h08Q6mjSKGVOa1%2B81YA%3D')
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/base_malnutrition.csv') as response:
+    base_malnutrition = pd.read_csv(response)
 top10_df_m = top10table.createTable_top(modelo_malnutrition, base_malnutrition)
 p_range_m = str(top10_df_m["Range_probability"].iloc[0])
 n_children_m = top10_df_m.shape[0]
