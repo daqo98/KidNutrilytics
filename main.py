@@ -34,8 +34,8 @@ sidebar = html.Div(
                             active="exact"),
                 html.Hr(),
                 html.P("ANALYTICS", className='text-p'),
-                dbc.NavLink(children=[html.Img(src='/assets/dash_icon.png'), '  Dashboard'], href='/apps/Dashboard',
-                            active="exact"),
+                #dbc.NavLink(children=[html.Img(src='/assets/dash_icon.png'), '  Dashboard'], href='/apps/Dashboard',
+                #            active="exact"),
                 html.P("CHILDREN AT RISK", className='text-p'),
                 dbc.NavLink(children=[html.Img(src='/assets/db_icon.png'), '  Database Prediction'],
                             href='/apps/Malnutrition', active="exact"),
@@ -72,8 +72,8 @@ app.layout = html.Div([
 def display_page(pathname):
     if pathname == '/apps/Home':
         return Home.layout
-    if pathname == '/apps/Dashboard':
-        return dashboard.layout
+    #if pathname == '/apps/Dashboard':
+    #    return dashboard.layout
     if pathname == '/apps/Malnutrition':
         return Malnutrition.layout
     if pathname == '/apps/PredicTool':

@@ -14,53 +14,40 @@ import joblib
 from utils import top10table
 from utils import SHAP_Val
 import pyodbc
+from azure.storage.blob import BlockBlobService
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 """
--------------------------------------------SQL Connection------------------------------------
+-------------------------------------------Azure Blob Connection------------------------------------
 """
-server = 'ds4a-server2.database.windows.net'
-database = 'ds4a'
-username = 'namonroyr'
-password = 'ds4a123*'
-driver= '/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.8.so.1.1'
 
-conn = pyodbc.connect('DRIVER='+driver+';SERVER=tcp:'+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password)
+STORAGEACCOUNTURL= 'https://kidnutrilytics2.blob.core.windows.net'
+STORAGEACCOUNTKEY= '+ffYpxk6Kw3fh8Xhkgu/Gn8dVF5tQSvFKtGWRxLxA6/4pdjsx5uxMHQJILboNCz+OV5nxEnL+Dq63+uS5IghRA=='
+CONTAINERNAME= 'blob2'
+LOCALFILENAME_RELAPSE= 'assets/base_relapse.csv'
+BLOBNAME_RELAPSE= 'base_relapse.csv'
+LOCALFILENAME_MALNUTRITION= 'assets/base_malnutrition.csv'
+BLOBNAME_MALNUTRITION= 'base_malnutrition.csv'
 
-def execute_azure_query(query, with_cursor=False):
-    cursor = conn.cursor()
-    try:
-        cursor.execute(query)
-        res = cursor.fetchall()
-        if with_cursor:
-            return (res, cursor)
-        else:
-            return res
-    finally:
-        pass
-        cursor.close()
+#download from blob
+blob_service_client_instance = BlobServiceClient(account_url=STORAGEACCOUNTURL, credential=STORAGEACCOUNTKEY)
+blob_client_instance_rel = blob_service_client_instance.get_blob_client(CONTAINERNAME, BLOBNAME_RELAPSE, snapshot=None)
+with open(LOCALFILENAME_RELAPSE, "wb") as my_blob:
+    blob_data = blob_client_instance_rel.download_blob()
+    blob_data.readinto(my_blob)
 
+blob_client_instance_mal = blob_service_client_instance.get_blob_client(CONTAINERNAME, BLOBNAME_MALNUTRITION, snapshot=None)
+with open(LOCALFILENAME_MALNUTRITION, "wb") as my_blob:
+    blob_data = blob_client_instance_rel.download_blob()
+    blob_data.readinto(my_blob)
 
-def pandas_df_from_azure_query(query):
-    df = pd.read_sql(query,conn)
-    return df
-
-"""
--------------------------------------------Data-SQL Queries------------------------------------
-"""
 
 #-----------------------------------------*Relapse*-------------------------------------
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_relapse.sav') as response:
     modelo_relapse = joblib.load(response)
 
-base_relapse = pandas_df_from_azure_query(
-"""
-SELECT *
-FROM ICBF.base_relapse
-"""
-)
-
+base_relapse = pd.read_csv(LOCALFILENAME_RELAPSE)
 top10_df_r = top10table.createTable_top(modelo_relapse, base_relapse)
 p_range_r = str(top10_df_r["Range_probability"].iloc[0])
 n_children_r = top10_df_r.shape[0]
@@ -69,36 +56,12 @@ s_table_r, plot_table_r = top10table.table_to_show(top10_df_r)
 show_table_r = s_table_r[s_table_r['AVG ZScore'] > -100].sample(1000)
 dist_plot_r = zscore_plot.zscore_distplot(show_table_r)
 
-"""
-#probability range
-p_range_r = requests.get('https://sharpmicro2-zbca65qbuq-nn.a.run.app/api/v2/rel_p').json()
-#number of children at risk
-n_children_r = requests.get('https://sharpmicro2-zbca65qbuq-nn.a.run.app/api/v2/rel_n').json()
-#Shap values img
-shap_r = requests.get('https://sharpmicro2-zbca65qbuq-nn.a.run.app/api/v2/shap_rel').json()
-#Table with data to show on the app
-df_show_r_dict = requests.get("https://sharpmicro2-zbca65qbuq-nn.a.run.app/api/v2/show_rel", headers={"content-type":"text", "initial":str(0), "end":str(1000)}).json()
-df_show_r = pd.DataFrame.from_dict(df_show_r_dict)
-
-show_table_r = df_show_r[['Child ID', 'MIN ZScore', 'MAX ZScore', 'AVG ZScore', 'Malnutrition Count', 'Appropiate Count',
-                    'Probability']].copy()
-
-plot_table_r = df_show_r[['Child ID', 'ind_estudia', 'ingresos_promp_imp', 'uni_dias_agua', 'noprivaciones',
-                    'tipo_cuidado', 'cod_clase', 'sexo_persona', 'estrato']].copy()
-dist_plot_r = zscore_plot.zscore_distplot(show_table_r)
-"""
 #-----------------------------------------*Malnutrition*----------------------------------
 
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_malnutrition.sav') as response:
     modelo_malnutrition = joblib.load(response)
 
-base_malnutrition = pandas_df_from_azure_query(
-"""
-SELECT *
-FROM ICBF.base_malnutrition
-"""
-)
-#-----------------------------------------*Malnutrition*------------------------------
+base_malnutrition = pd.read_csv(LOCALFILENAME_MALNUTRITION)
 top10_df_m = top10table.createTable_top(modelo_malnutrition, base_malnutrition)
 p_range_m = str(top10_df_m["Range_probability"].iloc[0])
 n_children_m = top10_df_m.shape[0]
