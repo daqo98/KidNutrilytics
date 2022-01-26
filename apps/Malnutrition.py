@@ -45,7 +45,7 @@ with open(LOCALFILENAME_MALNUTRITION, "wb") as my_blob:
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_relapse.sav') as response:
     modelo_relapse = joblib.load(response)
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/base_relapse.csv') as response:
-    base_relapse = pd.read_csv(response)
+    base_relapse = pd.read_csv(response).drop(["IdBeneficiario","Unnamed: 0"],axis=1)
 top10_df_r = top10table.createTable_top(modelo_relapse, base_relapse)
 p_range_r = str(top10_df_r["Range_probability"].iloc[0])
 n_children_r = top10_df_r.shape[0]
@@ -59,7 +59,7 @@ dist_plot_r = zscore_plot.zscore_distplot(show_table_r)
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/Modelo_malnutrition.sav') as response:
     modelo_malnutrition = joblib.load(response)
 with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/base_malnutrition.csv') as response:
-    base_malnutrition = pd.read_csv(response)
+    base_malnutrition = pd.read_csv(response).drop(["IdBeneficiario","Unnamed: 0","Unnamed: 0.1"],axis=1)
 top10_df_m = top10table.createTable_top(modelo_malnutrition, base_malnutrition)
 p_range_m = str(top10_df_m["Range_probability"].iloc[0])
 n_children_m = top10_df_m.shape[0]
