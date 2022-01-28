@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 from app import app
 
 # Connect to app pages
-from apps import  Home, PredicTool, About, Malnutrition
+from apps import  Home, PredicTool, About, Malnutrition, dashboard
 header = dbc.Navbar(
     [
         html.A(
