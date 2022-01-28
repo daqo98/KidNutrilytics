@@ -56,6 +56,8 @@ dpts_count['cod_dpto']=pd.to_numeric(dpts_count['cod_dpto'])
 dpts_count['cod_dpto']=dpts_count['cod_dpto'].astype(int).apply(lambda x: '{0:0>2}'.format(x))
 
 fig_years_dist = plot_by_year.ploting_distribution(base_pivot)
+figmap_rel = mapcolombia.getfigmap(dpts_count, 'Relapse_Percentage', 'peach', colombia)
+figmap_mal = mapcolombia.getfigmap(dpts_count, 'Malnutrition_Percentage', 'emrld', colombia)
 
 card_map = dbc.Card(
     dbc.CardBody([
@@ -65,7 +67,7 @@ card_map = dbc.Card(
         html.Div(
             dcc.Graph(
                 id='colombia_plot',
-                figure={}
+                figure=figmap_rel
             )
         )
     ])
@@ -78,7 +80,7 @@ card_map2 = dbc.Card(
         html.Div(
             dcc.Graph(
                 id='colombia_plot_2',
-                figure={}
+                figure=figmap_mal
             )
         )
     ])
@@ -121,12 +123,3 @@ layout = dbc.Container([
         )
       ])
 ], fluid=True)
-
-
-@app.callback([Output('colombia_plot', 'figure'),
-              Output('colombia_plot_2', 'figure'),])
-def display_maps(value):
-    #dpts_count_filtered = dpts_count[dpts_count['Año']==value]
-    figmap_rel = mapcolombia.getfigmap(dpts_count, 'Relapse_Percentage', 'peach', colombia)
-    figmap_mal = mapcolombia.getfigmap(dpts_count, 'Malnutrition_Percentage', 'emrld', colombia)
-    return figmap_rel, figmap_mal
