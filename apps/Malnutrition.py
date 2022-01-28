@@ -20,25 +20,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 """
 -------------------------------------------Azure Blob Connection------------------------------------
-
-STORAGEACCOUNTURL= 'https://kidnutrilytics2.blob.core.windows.net'
-CONTAINERNAME= 'blob2'
-LOCALFILENAME_RELAPSE= 'assets/base_relapse.csv'
-BLOBNAME_RELAPSE= 'base_relapse.csv'
-LOCALFILENAME_MALNUTRITION= 'assets/base_malnutrition.csv'
-BLOBNAME_MALNUTRITION= 'base_malnutrition.csv'
-
-#download from blob
-blob_service_client_instance = BlobServiceClient(account_url=STORAGEACCOUNTURL, credential=STORAGEACCOUNTKEY)
-blob_client_instance_rel = blob_service_client_instance.get_blob_client(CONTAINERNAME, BLOBNAME_RELAPSE, snapshot=None)
-with open(LOCALFILENAME_RELAPSE, "wb") as my_blob:
-    blob_data = blob_client_instance_rel.download_blob()
-    blob_data.readinto(my_blob)
-
-blob_client_instance_mal = blob_service_client_instance.get_blob_client(CONTAINERNAME, BLOBNAME_MALNUTRITION, snapshot=None)
-with open(LOCALFILENAME_MALNUTRITION, "wb") as my_blob:
-    blob_data = blob_client_instance_rel.download_blob()
-    blob_data.readinto(my_blob)
 """
 
 #-----------------------------------------*Relapse*-------------------------------------
