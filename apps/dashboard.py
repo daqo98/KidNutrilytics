@@ -6,6 +6,7 @@ import pathlib
 from app import app
 import dash_bootstrap_components as dbc
 # colombian map dependencies
+from functools import reduce
 from utils import mapcolombia
 from utils import plot_by_year
 import pandas as pd
@@ -14,64 +15,19 @@ import requests
 import math
 import ssl
 import json
-import pyodbc
-
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 with urlopen('https://raw.githubusercontent.com/namonroyr/colombia_mapa/master/co_2018_MGN_DPTO_POLITICO.geojson') as response:
     colombia = json.load(response)
 
-"""
--------------------------------------------SQL Connection------------------------------------
-"""
-server = 'ds4a-server2.database.windows.net'
-database = 'ds4a'
-username = 'namonroyr'
-password = 'ds4a123*'
-driver= '/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.8.so.1.1'
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/base_target_final_190101_red.csv') as response:
+    base_target = pd.read_csv(response)
 
-conn = pyodbc.connect('DRIVER='+driver+';SERVER=tcp:'+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password)
+####PLot by year
+with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/tomas_pivot_red.csv') as response:
+    base_pivot = pd.read_csv(response, sep = '|')
 
-def execute_azure_query(query, with_cursor=False):
-    cursor = conn.cursor()
-    try:
-        cursor.execute(query)
-        res = cursor.fetchall()
-        if with_cursor:
-            return (res, cursor)
-        else:
-            return res
-    finally:
-        pass
-        cursor.close()
-
-
-def pandas_df_from_azure_query(query):
-    df = pd.read_sql(query,conn)
-    return df
-
-#Se filtran beneficiarios cuyo target de relapse para los próximos 6 meses sea 1
-df_base_target_2018 = pandas_df_from_azure_query(
-"""
-SELECT IdBeneficiario, Marca_Target_Reincidencia_F6M, Marca_Target_EntroEnDesnutricion_F6M,
-cod_dpto, nom_dpto
-FROM ICBF.base_target_2018
-"""
-)
-
-df_base_target_2019 = pandas_df_from_azure_query(
-"""
-SELECT IdBeneficiario, Marca_Target_Reincidencia_F6M, Marca_Target_EntroEnDesnutricion_F6M,
-cod_dpto, nom_dpto
-FROM ICBF.base_target_2019
-"""
-)
-
-df_base_target_2018['Año'] = 2018
-df_base_target_2019['Año'] = 2019
-
-df_base_target = pd.concat(df_base_target_2018, df_base_target_2019)
 
 #Se filtran beneficiarios cuyo target de relapse para los próximos 6 meses sea 1
 df_target1_relapse = base_target[base_target['Marca_Target_Reincidencia_F6M']==1]
@@ -99,35 +55,7 @@ dpts_count["Malnutrition_Percentage"] = dpts_count["Count_Dpto_Malnutrition"]/dp
 dpts_count['cod_dpto']=pd.to_numeric(dpts_count['cod_dpto'])
 dpts_count['cod_dpto']=dpts_count['cod_dpto'].astype(int).apply(lambda x: '{0:0>2}'.format(x))
 
-#mapa = requests.get("https://mapsmicroservice-zbca65qbuq-nn.a.run.app/api/v1/maps")
-#dpts_count = pd.DataFrame.from_dict(mapa.json())
-
-####PLot by year
-base_pivot = pandas_df_from_azure_query(
-"""
-SELECT *
-FROM ICBF.tomas_pivot
-"""
-)
-
 fig_years_dist = plot_by_year.ploting_distribution(base_pivot)
-
-years = dpts_count['Año'].unique()
-slider_items = {int(math.floor(years[i])):str(math.floor(years[i])) for i in range(len(years))}
-
-"""
-controlslider = html.Div([
-    dcc.RangeSlider(
-        id='slider-year',
-        min=2017,
-        max=2020,
-        step=None,            # True, False - insert dots, only when step>1
-        allowCross=False,
-        marks=slider_items,
-        value=2017,
-    )
-])
-"""
 
 card_map = dbc.Card(
     dbc.CardBody([
@@ -175,18 +103,6 @@ colombian_maps = dbc.Card([
     dbc.CardBody([
         dbc.Row([
             dbc.Col(
-                dcc.Slider(
-                    id='slider-year',
-                    min=2017,
-                    max=2020,
-                    step=None,
-                    marks=slider_items,
-                    value=2017,
-                ), width=12
-            )
-        ]),
-        dbc.Row([
-            dbc.Col(
                 card_map2, width = 6
             ),
             dbc.Col(
@@ -208,10 +124,9 @@ layout = dbc.Container([
 
 
 @app.callback([Output('colombia_plot', 'figure'),
-              Output('colombia_plot_2', 'figure'),],
-              [Input('slider-year', 'value')])
+              Output('colombia_plot_2', 'figure'),])
 def display_maps(value):
-    dpts_count_filtered = dpts_count[dpts_count['Año']==value]
-    figmap_rel = mapcolombia.getfigmap(dpts_count_filtered, 'Relapse_Percentage', 'peach', colombia)
-    figmap_mal = mapcolombia.getfigmap(dpts_count_filtered, 'Malnutrition_Percentage', 'emrld', colombia)
+    #dpts_count_filtered = dpts_count[dpts_count['Año']==value]
+    figmap_rel = mapcolombia.getfigmap(dpts_count, 'Relapse_Percentage', 'peach', colombia)
+    figmap_mal = mapcolombia.getfigmap(dpts_count, 'Malnutrition_Percentage', 'emrld', colombia)
     return figmap_rel, figmap_mal
