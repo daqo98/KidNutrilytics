@@ -21,11 +21,11 @@ ssl._create_default_https_context = ssl._create_unverified_context
 with urlopen('https://raw.githubusercontent.com/namonroyr/colombia_mapa/master/co_2018_MGN_DPTO_POLITICO.geojson') as response:
     colombia = json.load(response)
 
-with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/base_target_final_190101_red.csv') as response:
+with urlopen('https://kidnutrilytics3.blob.core.windows.net/blob3/base_target_final_190101_red.csv') as response:
     base_target = pd.read_csv(response)
 
 ####PLot by year
-with urlopen('https://kidnutrilytics2.blob.core.windows.net/blob2/tomas_pivot_red.csv') as response:
+with urlopen('https://kidnutrilytics3.blob.core.windows.net/blob3/tomas_pivot_red.csv') as response:
     base_pivot = pd.read_csv(response, sep = '|')
 
 

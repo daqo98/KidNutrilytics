@@ -12,12 +12,12 @@ jobs:
     - uses: actions/checkout@v2
     - uses: azure/docker-login@v1
       with:
-        login-server: kidnutrilytics2.azurecr.io
+        login-server: kidnutrilytics3.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker build . -t kidnutrilytics2.azurecr.io/myapp:${{ github.sha }}
-        docker push kidnutrilytics2.azurecr.io/myapp:${{ github.sha }}
+        docker build . -t kidnutrilytics3.azurecr.io/myapp:${{ github.sha }}
+        docker push kidnutrilytics3.azurecr.io/myapp:${{ github.sha }}
 
     - name: Building web app
       uses: azure/appservice-build@v2
@@ -25,6 +25,6 @@ jobs:
     - name: Deploy web App using GH Action azure/webapps-deploy     
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'kidnutrilytics2'
+        app-name: 'kidnutrilytics3'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        images: 'kidnutrilytics2.azurecr.io/myapp:${{ github.sha }}'
+        images: 'kidnutrilytics3.azurecr.io/myapp:${{ github.sha }}'
